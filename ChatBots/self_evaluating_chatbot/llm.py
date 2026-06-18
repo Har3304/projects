@@ -83,13 +83,12 @@ business_problem = '''A multinational ride-sharing company wants to expand its e
 
 initial_prompt = f"""
 You are an AI Manager overseeing a workflow. Read this business problem: 
-"{business_problem}"
-
+{business_problem}
 Task:
 1. Write a comprehensive system prompt that assigns an expert role (e.g., Senior Public Policy Analyst & Economic Forecaster) to a secondary AI. 
 2. In that prompt, detail the problem and clearly list what data models, legislative tracking, and strategies need evaluation.
-3. Add a strict completion rule: If the secondary AI successfully solves the problem, it must conclude its final answer with the single lowercase word 'exit' on a brand new line. If it fails to solve it, it must output a prompt delegating the task to the next AI agent in line.
-"""
+3. Add a strict completion rule: If the secondary AI successfully solves the problem, it must conclude its final answer with the single lowercase word 'exit' on a brand new line. If it fails to solve it, it must output a prompt delegating the task to the next AI agent in line."""
+
 
 while True:
     if response == '':
@@ -106,3 +105,13 @@ while True:
         
         response = bot.invoke(response)
         print("Running next stage of evaluation...")
+
+df = pd.read_csv('chat_history.csv')
+
+last_response = df['response']
+
+print(f"--- Total Character Length: {len(last_response)} ---")
+print("\n--- FULL TEXT START ---\n")
+for i in df['response']:
+  print(i)
+print("\n--- FULL TEXT END ---")
