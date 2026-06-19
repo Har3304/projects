@@ -1,37 +1,3 @@
-"""
-site_intelligence_pipeline.py
-
-Unified pipeline that:
-  1. Crawls a site's sitemap(s) recursively.
-  2. For every real page (not a sub-sitemap, not an image), fetches the page ONCE
-     and uses that single fetch for both:
-       a) JSON-LD schema generation (saved to disk, mirroring the URL structure)
-       b) A page summary (used to build llms.txt)
-  3. Builds an llms.txt file via LLM, then programmatically inserts the list of
-     generated schema file links under the "## Schema Files" heading -- this
-     step is done in code, not by the LLM, so it can never be skipped or
-     malformed.
-
-Fixes applied vs. the original two standalone scripts:
-  - Schema JSON is always round-tripped through json.loads/json.dumps(indent=2).
-    This guarantees consistent indentation AND eliminates duplicate keys, since
-    a Python dict cannot hold two values under the same key (last one wins on
-    parse) -- this is a structural fix, not just a prompt instruction.
-  - Page @type is no longer left to the LLM's judgement. It's computed
-    deterministically in code (infer_page_type) from the URL pattern and which
-    sitemap it came from, then passed to the LLM as a hint it must follow
-    unless the scraped text actively contradicts it.
-  - Removed a stray `break` in the original crawler that silently limited
-    processing to only the first non-sitemap URL per directory level.
-  - Each page is fetched exactly once instead of twice.
-  - If the model's raw JSON output fails to parse, a single repair pass is
-    attempted (asking the model to fix syntax only) before falling back to
-    saving the raw text with a clear warning, so failures are visible instead
-    of silently producing broken files.
-
-Usage (see bottom of file for a runnable example).
-"""
-
 import os
 import re
 import json
